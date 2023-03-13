@@ -43,7 +43,9 @@ def creer_grille_vide(N: int):
 def echanger_bonbons(grille, i1, i2, j1, j2):
     """
     Échange la position dans la grille du bonbon de coordonnées (i1,j1) avec 
-    celui de coordonnées (i2, j2), choisis par le joueur
+    celui de coordonnées (i2, j2), choisis par le joueur (si les coordonnées
+    sont valides: à côté l'un de l'autre). Renvoie True si l'échange s'est bien 
+    passée, False sinon.
 
     Entrée:
         grille: list
@@ -53,7 +55,7 @@ def echanger_bonbons(grille, i1, i2, j1, j2):
         j2: int
         
     Sortie:
-        grille: list
+        état: booléen
     """
 
     
