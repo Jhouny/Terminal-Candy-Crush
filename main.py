@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from random import randint
 import os
 from time import sleep
+from deps import *
 
 def creer_grille_aleatoire(N: int):
     """
@@ -30,12 +31,13 @@ def coordonnees_in_range(grille, i, j):
     else:
         return True
 
-def echanger_bonbons(grille, i1, i2, j1, j2):  # 
+def echanger_bonbons(grille, i1, i2, j1, j2):
     """
     Échange la position dans la grille du bonbon de coordonnées (i1,j1) avec 
     celui de coordonnées (i2, j2), choisis par le joueur (si les coordonnées
     sont valides: à côté l'une de l'autre).
     """
+
     if coordonnees_in_range(grille, i1, j1) and coordonnees_in_range(grille, i2, j2):
         # Si les bonbons sont alignées horizontalement ou verticalement(mais pas diagonalement) les échange
         if abs(i1-i2) + abs(j1-j2) == 1:
@@ -109,16 +111,39 @@ def affichage_grille(grille, nb_type_bonbons):
     plt.draw()
     plt.pause(0.1)
     """
-    print(" __|", end="")
+    # print(" __|", end="")
+    # for i in range(len(grille)-1):
+    #     print(f"_{i}", end="_|")
+    # print(f"_{len(grille)-1}", end="_")
+    # print()
+    # for i in range(len(grille)):
+    #     print(f" {i} |", end="")
+    #     for j in grille[i]:
+    #         print(f" {j} ", end=" ")
+    #     print()
+    # print()
+    tS = os.get_terminal_size()[0]
+    s = f"_{chr(0x2502)}"
     for i in range(len(grille)-1):
-        print(f"_{i}", end="_|")
-    print(f"_{len(grille)-1}", end="_")
-    print()
+        s += f"{i}{chr(0x2502)}"
+    s += f"{len(grille)-1}"
+    print(f"{s: ^{tS}}")
+
     for i in range(len(grille)):
-        print(f" {i} |", end="")
+        stringFinal = f"{i}{chr(0x2502)}"
         for j in grille[i]:
-            print(f" {j} ", end=" ")
-        print()
+            couleur = ""
+            ch = chr(0x263C)
+            if j == 1:
+                couleur = bcolors.BLUE
+            elif j == 2:
+                couleur = bcolors.RED
+            elif j == 3:
+                couleur = bcolors.YELLOW
+            elif j == 4:
+                couleur = bcolors.GREEN
+            stringFinal += f"{couleur}{ch}{bcolors.ENDC} "
+        print(f"\t\t       {stringFinal: ^{tS}}")
     print()
 
 def test_detecte_coordonnees_combinaison():
@@ -170,17 +195,6 @@ def verifier_possibilite(grille):
     combinaison. S'il est possible, renvoie True. Sinon, renvoie False.
     """
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
 class Jeu():
     def __init__(self) -> None:
         self.taille_tableau = -1
@@ -192,52 +206,60 @@ class Jeu():
             self.commande_efface_ecran = "clear"
 
         self.enCourse = True
-        self.etatJeu = False
+        self.etatJeu = "MENU"
 
         """
         Structure par index: 0 -> commande à appeller:
                              1 -> Description du commande
                              2 -> Nombre d'arguments que la fonction accepte
+                             3 -> "PRT" si le commande est toujours disponible (En Jeu et dans le Menu), 
+                                  "JEU" si juste en jeu, "MENU" si juste en menu.
+                            
         """                       
         self.command_palette = {  
-            'quitter': [self.quitter, "Quitte le jeu si pendant une partie, sinon ferme le programme"],
-            'taille': [self.definir_taille_tableau, "Defini la taille du tableau "],
-            'commencer': [self.commencer_jeu, "Commence la partie"],
-            'echanger': [echanger_bonbons, "Echange la position de deux bonbons"],
-            'redemarrer': [self.redemarrer, "Redemarre la partie en cours"],
+            'quitter': [self.quitter, "Quitte le jeu si pendant une partie, sinon ferme le programme", 0, "PRT"],
+            'taille': [self.definir_taille_tableau, "Defini la taille du tableau ", 1, "MENU"],
+            'commencer': [self.commencer_jeu, "Commence la partie", 0, "MENU"],
+            'echanger': [self.echanger, "Echange la position de deux bonbons (e.g. echanger i1,j1 i2,j2)", 0, "JEU"],
+            'redemarrer': [self.redemarrer, "Redemarre la partie en cours", 0, "JEU"],
         }
 
 
     def efface_ecran(self):
         os.system(self.commande_efface_ecran)
 
-    def definir_taille_tableau(self, N: int):
-        self.taille_tableau = N
-        print(f"Taille defini égale à: {self.taille_tableau}...")
-        sleep(2)  # Attends 2 secondes pour qu'on puisse lire
+    def definir_taille_tableau(self, args: list):
+        self.taille_tableau = int(args[0])
 
     def creer_tableau(self):
         self.grille = creer_grille_aleatoire(self.taille_tableau)
     
+    def echanger(self, args: list):
+        #echanger_bonbons(self.grille, int(args[0].split(',')[0]), int(args[1].split(',')[0]), int(args[0].split(',')[1]), int(args[1].split(',')[1]))
+        echanger_bonbons(self.grille, int(args[0].split(',')[1]), int(args[1].split(',')[1]), int(args[0].split(',')[0]), int(args[1].split(',')[0]))
 
     # Serie des fonctions pour appelle des commandes
     def quitter(self):
-        if self.etatJeu == True:  # Si le jeu est en cours d'execution, retourne à l'ecran principale
-            self.etatJeu = False
+        if self.etatJeu == "JEU":  # Si le jeu est en cours d'execution, retourne à l'ecran principale
+            self.etatJeu = "MENU"
         else:                     # Sinon, quitter le programme
             self.enCourse = False
     
     def commencer_jeu(self):
-        self.etatJeu = True
+        self.etatJeu = "JEU"
         self.creer_tableau()
 
     def redemarrer(self):
         self.grille = creer_grille_aleatoire(self.taille_tableau)
 
     def afficher_commandes_possibles(self):
-        print(bcolors.WARNING + "Serie de commandes possibles: " + bcolors.ENDC)
+        print(bcolors.YELLOW + "Serie de commandes possibles: " + bcolors.ENDC)
         for commande in self.command_palette.keys():
-            print(f"Ecrivez {bcolors.BOLD}{commande}{bcolors.ENDC} pour: {self.command_palette[commande][1]}")
+            if self.etatJeu == "JEU" and self.command_palette[commande][3] in ["PRT", "JEU"]:
+                print(f"\tEcrivez {bcolors.BOLD}{commande}{bcolors.ENDC} pour: {self.command_palette[commande][1]}")
+            elif self.etatJeu == "MENU" and self.command_palette[commande][3] in ["PRT", "MENU"]:
+                print(f"\tEcrivez {bcolors.BOLD}{commande}{bcolors.ENDC} pour: {self.command_palette[commande][1]}")
+        print()
 
     def gerer_entree(self, commande: str, args):
         """
@@ -246,14 +268,15 @@ class Jeu():
         """    
 
         if commande in self.command_palette.keys():
-            arg = [int(i) for i in args[1:]]
+            arg = args[1:]
             if len(arg) > 0:
                 self.command_palette[commande][0](arg)
             else:
                 self.command_palette[commande][0]()
 
-    def commencer_jeu(self):
-        self.etatJeu = True
+    def afficher_jeu(self):
+        if(self.etatJeu == "JEU"):
+            affichage_grille(self.grille, 0)
 
 
 
@@ -262,8 +285,9 @@ def main():
     candyCrush.efface_ecran()
     while candyCrush.enCourse:
         candyCrush.afficher_commandes_possibles()
+        if candyCrush.etatJeu == "JEU":
+            candyCrush.afficher_jeu()
         commande = input("Commande: ").split(" ")
-        print(commande)
         candyCrush.gerer_entree(commande[0], commande)
         candyCrush.efface_ecran()
 
