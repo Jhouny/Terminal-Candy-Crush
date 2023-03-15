@@ -111,17 +111,7 @@ def affichage_grille(grille, nb_type_bonbons):
     plt.draw()
     plt.pause(0.1)
     """
-    # print(" __|", end="")
-    # for i in range(len(grille)-1):
-    #     print(f"_{i}", end="_|")
-    # print(f"_{len(grille)-1}", end="_")
-    # print()
-    # for i in range(len(grille)):
-    #     print(f" {i} |", end="")
-    #     for j in grille[i]:
-    #         print(f" {j} ", end=" ")
-    #     print()
-    # print()
+
     tS = os.get_terminal_size()[0]
     s = f"    \033[4m {chr(0x2502)}"
     for i in range(len(grille)-1):
@@ -133,7 +123,7 @@ def affichage_grille(grille, nb_type_bonbons):
         stringFinal = f"{i}{chr(0x2502)}"
         for j in grille[i]:
             couleur = ""
-            ch = chr(0x263C)
+            ch = chr(0x263C)  # IMPROV: set different chars for each type of candy
             if j == 1:
                 couleur = bcolors.BLUE
             elif j == 2:
@@ -197,7 +187,7 @@ def verifier_possibilite(grille):
 
 class Jeu():
     def __init__(self) -> None:
-        self.taille_tableau = -1
+        self.taille_tableau = 5  # Valeur defaut
         self.grille = None
         self.commande_efface_ecran = ""  
         if os.name == 'nt':  # Si on est sur Windows
