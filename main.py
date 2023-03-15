@@ -123,11 +123,11 @@ def affichage_grille(grille, nb_type_bonbons):
     #     print()
     # print()
     tS = os.get_terminal_size()[0]
-    s = f"_{chr(0x2502)}"
+    s = f"    \033[4m {chr(0x2502)}"
     for i in range(len(grille)-1):
         s += f"{i}{chr(0x2502)}"
     s += f"{len(grille)-1}"
-    print(f"{s: ^{tS}}")
+    print(f"{s: ^{tS}}\033[0m")
 
     for i in range(len(grille)):
         stringFinal = f"{i}{chr(0x2502)}"
