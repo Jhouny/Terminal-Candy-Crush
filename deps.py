@@ -13,8 +13,28 @@ class bcolors:
 
 
 """
-    1: Bleu
-    2: Rouge
-    3: Jaune
-    4: Vert
+Class qui contien les infos sur les types
+de bonbons (couleur, nom, charactere 
+respectif, etc.)
 """
+class Bonbon:
+    def __init__(self, nom, couleur, ch) -> None:
+        self.nom = nom
+        self.couleur = couleur
+        self.ch = ch
+        
+    def NOM(self):
+        return self.nom
+    def COULEUR(self):
+        return self.couleur
+    def CH(self):
+        return self.ch
+
+# Dictionaire qui contien tous les types de bonbons
+Bonbons = {
+    0: Bonbon('Vide', bcolors.ENDC, ' '),
+    1: Bonbon('Bleu', bcolors.BLUE, chr(0x263C)),
+    2: Bonbon('Rouge', bcolors.RED, chr(0x2666)),
+    3: Bonbon('Jaune', bcolors.YELLOW, chr(0x25D8)),
+    4: Bonbon('Vert', bcolors.GREEN, chr(0x25BC))
+}
