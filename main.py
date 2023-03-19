@@ -18,6 +18,13 @@ def creer_grille_vide(N: int):
     return [[0]*N]*N
 
 
+def copier_grille(grille: list) -> list:
+    liste_copie = creer_grille_vide(len(grille))
+    for i in range(len(grille)):
+        liste_copie[i] = grille[i].copy()
+    return liste_copie
+
+
 def coordonnees_in_range(grille, i, j):
     """
     Helper function: verifie si les coordonnees sont bien dans la grille
@@ -29,13 +36,12 @@ def coordonnees_in_range(grille, i, j):
         return True
 
 
-def echanger_bonbons(grille, i1, i2, j1, j2):
+def echanger_bonbons(grille, i1, i2, j1, j2) -> bool:
     """
     Échange la position dans la grille du bonbon de coordonnées (i1,j1) avec 
     celui de coordonnées (i2, j2), choisis par le joueur (si les coordonnées
     sont valides: à côté l'une de l'autre).
     """
-
     if coordonnees_in_range(grille, i1, j1) and coordonnees_in_range(grille, i2, j2):
         # Si les bonbons sont alignées horizontalement ou verticalement(mais pas diagonalement) les échange
         if abs(i1-i2) + abs(j1-j2) == 1:
@@ -49,7 +55,7 @@ def echanger_bonbons(grille, i1, i2, j1, j2):
         return False
 
 
-def detecte_coordonnees_combinaison(grille, i, j):
+def detecte_coordonnees_combinaison(grille, i, j) -> list:
     """
     Renvoie une liste contenant les coordonnées de tous les bonbons
     appartenant à la combinaison du bonbon (i, j), s'il y a une. 
@@ -92,7 +98,25 @@ def detecte_coordonnees_combinaison(grille, i, j):
                 return bonbons
 
     return []
-        
+
+
+def bouger_bonbons(grille, i1, i2, j1, j2):
+    """
+    Verifie si l'echange entre les bonbons est valide, au cas
+    où echanger_bonbons est appelée et renvoie True, sinon
+    renvoie False
+    """
+    grille_2 = copier_grille(grille)
+    # Essaie de faire l'echange pour verifier si ça engendre des combinaisons
+    echanger_bonbons(grille_2, i1, i2, j1, j2)
+    if (len(detecte_coordonnees_combinaison(grille_2, i1, j1)) >= 3 or
+       len(detecte_coordonnees_combinaison(grille_2, i2, j2)) >= 3):
+       echanger_bonbons(grille, i1, i2, j1, j2)
+       print("here")
+       return True
+    else:
+        return False
+
 
 def explication_jeu():
     """
@@ -145,10 +169,9 @@ def test_detecte_coordonnees_combinaison():
     """
 
 
-def supprime_bonbons(grille, index: list) -> int:
+def supprime_bonbons(grille, index: list):
     """
-    Supprime la combinaison de bonbons - remplace les valeurs par 0 et
-    renvoie les points. 
+    Supprime la combinaison de bonbons - remplace les valeurs par 0. 
     """
     for i, j in index:
         grille[i][j] = 0
@@ -257,7 +280,11 @@ class Jeu():
         self.grille = creer_grille_aleatoire(self.taille_tableau)
     
     def echanger(self, args: list):
-        echanger_bonbons(self.grille, int(args[0].split(',')[0]), int(args[1].split(',')[0]), int(args[0].split(',')[1]), int(args[1].split(',')[1]))
+        #echanger_bonbons(self.grille, int(args[0].split(',')[0]), int(args[1].split(',')[0]), int(args[0].split(',')[1]), int(args[1].split(',')[1]))
+        succes = bouger_bonbons(self.grille, int(args[0].split(',')[0]), int(args[1].split(',')[0]), int(args[0].split(',')[1]), int(args[1].split(',')[1]))
+        if not succes:
+            print(bcolors.RED + bcolors.BOLD + "Les coordonnees donnees n'engendrent pas une combinaison..." + bcolors.ENDC)
+            sleep(1.6)  # Valeur arbitraire
 
     # Serie des fonctions pour appelle des commandes
     def quitter(self):
@@ -296,11 +323,16 @@ class Jeu():
             else:
                 self.command_palette[commande][0]()
 
+    def afficher_points(self):
+        string = f"Points: {self.points}"
+        print(f"{string:>{self.taille_tableau*2 + 12}}\n")
+
     def afficher_jeu(self):
         """
         Appele la fonction qui affiche la grille
         """
         if(self.etatJeu == "JEU"):
+            self.afficher_points()
             affichage_grille(self.grille, 0)
 
     def animation(self, index: list):
