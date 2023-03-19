@@ -251,7 +251,7 @@ class Jeu():
         self.enCourse = True
         self.etatJeu = "MENU"
 
-        self.delai = 0.6  # 600ms delai 
+        self.delai = 0.45  # 450ms delai 
 
         """
         Structure par index: 0 -> commande à appeller:
