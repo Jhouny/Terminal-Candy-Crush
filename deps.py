@@ -1,40 +1,33 @@
+WARNING = '\033[91m'
+JAUNE = '\033[93m'
+ENDC = '\033[0m'
+BOLD = '\033[1m'
+UNDERLINE = '\033[4m'
 
-class bcolors:
-    HEADER = '\033[95m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+CouleursBonbons = ['\033[0m',  # Vide
+                   '\033[94m', # Bleu
+                   '\033[91m', # Rouge
+                   '\033[93m', # Jaune
+                   '\033[92m', # Vert
+                  ]
 
+CharsBonbons = [' ',         # Vide
+                chr(0x263C), # Bleuquitter
+                chr(0x2666), # Rouge
+                chr(0x25D8), # Jaune
+                chr(0x25BC), # Vert
+                ]
 
-"""
-Class qui contien les infos sur les types
-de bonbons (couleur, nom, charactere 
-respectif, etc.)
-"""
-class Bonbon:
-    def __init__(self, nom, couleur, ch) -> None:
-        self.nom = nom
-        self.couleur = couleur
-        self.ch = ch
-        
-    def NOM(self):
-        return self.nom
-    def COULEUR(self):
-        return self.couleur
-    def CH(self):
-        return self.ch
+commandes = ['quitter',
+             'taille',
+             'commencer',
+             'echanger',
+             'redemarrer']
 
-# Dictionaire qui contien tous les types de bonbons
-Bonbons = {
-    0: Bonbon('Vide', bcolors.ENDC, ' '),
-    1: Bonbon('Bleu', bcolors.BLUE, chr(0x263C)),
-    2: Bonbon('Rouge', bcolors.RED, chr(0x2666)),
-    3: Bonbon('Jaune', bcolors.YELLOW, chr(0x25D8)),
-    4: Bonbon('Vert', bcolors.GREEN, chr(0x25BC))
-}
+explications = ["Quitte le jeu si pendant une partie, sinon ferme le programme",
+                "Defini la taille du tableau",
+                "Commence la partie",
+                "Echange la position de deux bonbons (e.g. echanger i1,j1 i2,j2)",
+                "Redemarre la partie en cours",
+                ]
+

@@ -3,12 +3,24 @@ from random import randint
 import os
 from time import sleep
 
+# ~~~~~~~~~~ Variables principaux du programme ~~~~~~~~~~ #
+taille_tableau = 5  # Valeur defaut
+grille = []
+points = 0
+
+enCourse = True
+etatJeu = "MENU"
+
+delai = 0.45  # 450ms delai pour l'animation
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
 def creer_grille_aleatoire(N: int):
     """
     Crée et renvoie une grille 2D de taille NxN avec des valeurs aleatoires 
     (qui correspondent aux types de Bonbon sur l'objet 'Bonbons')    
     """
-    return [[randint(1, len(Bonbons)-1) for i in range(N)] for i in range(N)]
+    return [[randint(1, len(CouleursBonbons)-1) for i in range(N)] for i in range(N)]
 
 
 def creer_grille_vide(N: int):
@@ -63,36 +75,30 @@ def detecte_coordonnees_combinaison(grille, i, j) -> list:
     if coordonnees_in_range(grille, i, j) and grille[i][j] != 0:
         # Fait d'abord l'analyse verticale
         bonbons = []  # Stocker les bonbons valides
-        somme = 0  # Compte la taille de la combinaison
         ind = i
         while ind >= 0 and grille[ind][j] == grille[i][j]:
             bonbons.append((ind, j))
             ind -= 1
-            somme += 1
 
         ind = i+1
         while ind < len(grille) and grille[ind][j] == grille[i][j]:
             bonbons.append((ind, j))
             ind += 1
-            somme += 1
 
         if len(bonbons) >= 3:
             return bonbons
         else:
             # Ensuite, s'il n'y a pas de combinaison verticale, verifie la droite horizontale
             bonbons = []
-            somme = 0 
             ind = j
             while ind >= 0 and grille[i][ind] == grille[i][j]:
                 bonbons.append((i, ind))
                 ind -= 1
-                somme += 1
 
             ind = j+1
             while ind < len(grille[0]) and grille[i][ind] == grille[i][j]:
                 bonbons.append((i, ind))
                 ind += 1
-                somme += 1
             
             if len(bonbons) >= 3:
                 return bonbons
@@ -100,7 +106,7 @@ def detecte_coordonnees_combinaison(grille, i, j) -> list:
     return []
 
 
-def bouger_bonbons(grille, i1, i2, j1, j2):
+def bouger_bonbons(grille, i1, i2, j1, j2, modifier=True):
     """
     Verifie si l'echange entre les bonbons est valide, au cas
     où echanger_bonbons est appelée et renvoie True, sinon
@@ -111,8 +117,8 @@ def bouger_bonbons(grille, i1, i2, j1, j2):
     echanger_bonbons(grille_2, i1, i2, j1, j2)
     if (len(detecte_coordonnees_combinaison(grille_2, i1, j1)) >= 3 or
        len(detecte_coordonnees_combinaison(grille_2, i2, j2)) >= 3):
-       echanger_bonbons(grille, i1, i2, j1, j2)
-       print("here")
+       if modifier:
+            echanger_bonbons(grille, i1, i2, j1, j2)
        return True
     else:
         return False
@@ -120,9 +126,29 @@ def bouger_bonbons(grille, i1, i2, j1, j2):
 
 def explication_jeu():
     """
-    Donne des explications sur le fonctionnement du jeu
+    Donne des explications sur le fonctionnement du jeu dans la lague choisi
     """
+    print("Bienvenue dans ce merveilleux jeu\"Candy Crush\"!!")
+    print("\nObjectif du jeu: ")
+    print("Dans un temps défini par le joueur, l'objectif est de marquer des points en échangeant de position les bonbons")
+    print("\nRègles du jeu: ")
+    print("1. Une combinaison est possible si 3 bonbons de la même couleur ou plus sont alignés verticalement ou horizontalement")
+    print("2. Pour créer cette combinaison, le joueur peut échanger un bonbon avec son voisin")
+    print("3. Mais attention!!! C'est possible seulement si le changement crée une combinaison")
+    print("4. Chaque combinaison realisée donne des points en fonction du nombre de bonbons")
+    print("5. S'il n'y a plus de combinaison possibles, la grille sera remplacée automatiquement")
 
+    print("Bienvenido a este maravilloso juego \"Candy Crush\"!!")
+    print("\nObjetivo del juego: ")
+    print("En un tiempo definido por el jugador, el objetivo es de conseguir puntos intercambiando las posiciones de los dulces ")
+    print("\nReglas del juego: oh lala ")
+    print("1. Una combinación es posible si tres o más dulces están alineados vertical u horizontalmente")
+    print("2. Para crear esta combinación, el jugador puede intercambiar un dulce con su vecino")
+    print("3. ¡¡¡Pero cuidado!!! Es posible solamente si el intercambio crea una combinación")
+    print("4. Cada combinación realizada da puntos en función del número de dulces")
+    print("5. Si no hay más combinaciones posibles, el tablero será remplazado automáticamente")
+    
+    
 
 def affichage_grille(grille, nb_type_bonbons):
     """
@@ -130,18 +156,16 @@ def affichage_grille(grille, nb_type_bonbons):
     maximum "nb_type_bonbons" couleurs de bonbons différentes.
     """
 
-    tS = os.get_terminal_size()[0]
-    s = f"\033[4m {chr(0x2502)}"
+    s = f"{UNDERLINE} {chr(0x2502)}"  # Char pour barre verticale
     for i in range(len(grille)-1):
         s += f"{i}{chr(0x2502)}"
-    s += f"{len(grille)-1}\033[0m"
+    s += f"{len(grille)-1}{ENDC}"
     print(s)
 
     for i in range(len(grille)):
         stringFinal = f"{i}{chr(0x2502)}"
-        for j in grille[i]:
-            bonbon = Bonbons[j]
-            stringFinal += f"{bonbon.COULEUR()}{bonbon.CH()}{bcolors.ENDC} "
+        for bonbon in grille[i]:
+            stringFinal += f"{CouleursBonbons[bonbon]}{CharsBonbons[bonbon]}{ENDC} "
         print(stringFinal)
     print()
 
@@ -177,39 +201,23 @@ def supprime_bonbons(grille, index: list):
         grille[i][j] = 0
 
 
-def descendre_bonbons(grille, index: list, pas = 1):
+def descendre_bonbons(grille):
     """
     Fait descendre les bonbons déjà existants pour remplir le trou
-    laissé par la fonction supprime_bonbons (retourné sur 'index')
+    laissé par la fonction supprime_bonbons
     """
-    elements = set(index)  # Au cas où 'index' contient des valeurs dupliquées
-    while len(elements) > 0:
-        x, y = min(elements)
-        i = x
-        while i < len(grille)-1 and grille[i][y] != 0:
-            i += 1
-        j = y
-        steps = 0
-        
-        elements.remove((x,y))
-        index.remove((x,y))
-        supp = []
-        for a,b in elements:
-            if b == y and a > x:
-                supp.append((a,b))
-        for elem in supp:
-            elements.remove(elem)
-
-        while i >= 0 and i < len(grille) and steps < pas:
-            try:
-                if grille[i+1][j] == 0:
-                    grille[i+1][j] = grille[i][j]
-                    grille[i][j] = 0
-            except IndexError:
-                pass
-            i -= 1
-        grille[0][j] = randint(1, len(Bonbons)-1)
-
+    for i in range(len(grille)):
+        for j in range(len(grille[0])):
+            y = i
+            if grille[i][j]==0 :
+                while y > 0 :
+                    grille[y][j]=grille[y-1][j]
+                    y -= 1
+                if y == 0 :
+                    grille[y][j]= randint(1, len(CouleursBonbons) - 1)
+                    
+                    
+                
 
 def nombre_vides(grille):
     """
@@ -224,7 +232,7 @@ def nombre_vides(grille):
 
 
 def remplir_grille(grille):
-    """
+    """  ON EN A BESOIN?
     Remplit les trous vides de la grille avec des valeurs aléatoires entre 
     1 et 4 aprés avoir utilisé la fonction descendre_bonbons
     """
@@ -235,147 +243,70 @@ def verifier_possibilite(grille):
     Verifie s'il est encore possible d'échanger deux bonbons pour faire une 
     combinaison. S'il est possible, renvoie True. Sinon, renvoie False.
     """
-
-
-class Jeu():
-    def __init__(self) -> None:
-        self.taille_tableau = 5  # Valeur defaut
-        self.grille = creer_grille_vide(self.taille_tableau)
-        self.points = 0
-        self.commande_efface_ecran = ""  
-        if os.name == 'nt':  # Si on est sur Windows
-            self.commande_efface_ecran = "cls"
-        elif os.name == 'posix':  # Si on est sur Linux
-            self.commande_efface_ecran = "clear"
-
-        self.enCourse = True
-        self.etatJeu = "MENU"
-
-        self.delai = 0.45  # 450ms delai 
-
-        """
-        Structure par index: 0 -> commande à appeller:
-                             1 -> Description du commande
-                             2 -> Nombre d'arguments que la fonction accepte
-                             3 -> "PRT" si le commande est toujours disponible (En Jeu et dans le Menu), 
-                                  "JEU" si juste en jeu, "MENU" si juste en menu.
-        """                       
-        self.command_palette = {  
-            'quitter': [self.quitter, "Quitte le jeu si pendant une partie, sinon ferme le programme", 0, "PRT"],
-            'taille': [self.definir_taille_tableau, "Defini la taille du tableau ", 1, "MENU"],
-            'commencer': [self.commencer_jeu, "Commence la partie", 0, "MENU"],
-            'echanger': [self.echanger, "Echange la position de deux bonbons (e.g. echanger i1,j1 i2,j2)", 0, "JEU"],
-            'redemarrer': [self.redemarrer, "Redemarre la partie en cours", 0, "JEU"]
-        }
-
-
-    def efface_ecran(self):
-        os.system(self.commande_efface_ecran)
-
-    def definir_taille_tableau(self, args: list):
-        self.taille_tableau = int(args[0])
-
-    def creer_tableau(self):
-        self.points = 0
-        self.grille = creer_grille_aleatoire(self.taille_tableau)
+    combinaisons = 0
+    for i in range(len(grille)):
+        for j in range(len(grille[0])):
+            if i+1 < len(grille) and bouger_bonbons(grille,i,j,i+1,j, modifier = False) == True :
+                combinaisons += 1
+            if j-1 > 0 and bouger_bonbons(grille,i,j,i,j-1) == True :
+                combinaisons += 1
+            if i-1 > 0 and bouger_bonbons(grille,i,j,i-1,j, modifier= False) == True :
+                combinaisons += 1
+            if j+1 < len(grille[0]) and bouger_bonbons(grille,i,j,i,j+1, modifier = False ) == True :
+                combinaisons += 1
     
-    def echanger(self, args: list):
-        #echanger_bonbons(self.grille, int(args[0].split(',')[0]), int(args[1].split(',')[0]), int(args[0].split(',')[1]), int(args[1].split(',')[1]))
-        succes = bouger_bonbons(self.grille, int(args[0].split(',')[0]), int(args[1].split(',')[0]), int(args[0].split(',')[1]), int(args[1].split(',')[1]))
-        if not succes:
-            print(bcolors.RED + bcolors.BOLD + "Les coordonnees donnees n'engendrent pas une combinaison..." + bcolors.ENDC)
-            sleep(1.6)  # Valeur arbitraire
+    if combinaisons == 0 :
+        return False 
+    else :
+        return True 
 
-    # Serie des fonctions pour appelle des commandes
-    def quitter(self):
-        if self.etatJeu == "JEU":  # Si le jeu est en cours d'execution, retourne à l'ecran principale
-            self.etatJeu = "MENU"
-        else:                     # Sinon, quitter le programme
-            self.enCourse = False
-    
-    def commencer_jeu(self):
-        self.etatJeu = "JEU"
-        self.points = 0
-        self.creer_tableau()
 
-    def redemarrer(self):
-        self.points = 0
-        self.grille = creer_grille_aleatoire(self.taille_tableau)
+def quitter():
+    """
+    Verifie l'etat du jeu: si on est en train de jouer
+    retourne au menu principal, sinon arrete le programme
+    """
+    if etatJeu == "JEU":  # Si le jeu est en cours d'execution, retourne à l'ecran principale
+        etatJeu = "MENU"
+    else:                 # Sinon, quitter le programme
+        enCourse = False
 
-    def afficher_commandes_possibles(self):
-        print(bcolors.YELLOW + "Serie de commandes possibles: " + bcolors.ENDC)
-        for commande in self.command_palette.keys():
-            if self.etatJeu == "JEU" and self.command_palette[commande][3] in ["PRT", "JEU"]:
-                print(f"\tEcrivez {bcolors.BOLD}{commande}{bcolors.ENDC} pour: {self.command_palette[commande][1]}")
-            elif self.etatJeu == "MENU" and self.command_palette[commande][3] in ["PRT", "MENU"]:
-                print(f"\tEcrivez {bcolors.BOLD}{commande}{bcolors.ENDC} pour: {self.command_palette[commande][1]}")
-        print()
+def efface_ecran(cmd):
+    os.system(cmd)
 
-    def gerer_entree(self, commande: str, args):
-        """
-        Verifie si l'entree est valide, au cas où decide quoi faire --> echanger
-        bonbons, quitter le jeu, redemarrer la partie, etc.
-        """    
-        if commande in self.command_palette.keys():
-            arg = args[1:]
-            if len(arg) > 0:
-                self.command_palette[commande][0](arg)
-            else:
-                self.command_palette[commande][0]()
+def afficher_commandes_possibles(etatJeu):
+    print(JAUNE + "Serie de commandes possibles: " + ENDC)
+    for i in range(len(commandes)):
+        commande = commandes[i]
+        if etatJeu == "JEU" and commandes[i] in ['quitter', 'echanger', 'redemarrer']:
+            print(f"\tEcrivez {BOLD}{commande}{ENDC} pour: {explications[i]}")
+        elif etatJeu == "MENU" and commandes[i] in ['quitter', 'commencer', 'taille']:
+            print(f"\tEcrivez {BOLD}{commande}{ENDC} pour: {explications[i]}")
+    print()
 
-    def afficher_points(self):
-        string = f"Points: {self.points}"
-        print(f"{string:>{self.taille_tableau*2 + 12}}\n")
-
-    def afficher_jeu(self):
-        """
-        Appele la fonction qui affiche la grille
-        """
-        if(self.etatJeu == "JEU"):
-            self.afficher_points()
-            affichage_grille(self.grille, 0)
-
-    def animation(self, index: list):
-        self.efface_ecran()
-        while nombre_vides(self.grille):
-            self.afficher_commandes_possibles()
-            self.afficher_jeu()
-            sleep(self.delai)
-            self.efface_ecran()
-            descendre_bonbons(self.grille, index)
-        
-        self.afficher_commandes_possibles()
-        self.afficher_jeu()
-
-    def mise_a_jour_jeu(self, animate=True):
-        """
-        Verifie les combinaisons et gère les points
-        """
-        enlevees = []
-        for i in range(self.taille_tableau):
-            for j in range(self.taille_tableau):
-                coords = detecte_coordonnees_combinaison(self.grille, i, j)
-                if len(coords) >= 3:  # Si il y a des cases où des combinaisons sont faits, supprime les et augmente les points
-                    self.points += len(coords)
-                    supprime_bonbons(self.grille, coords)
-                    enlevees += coords
-        if animate == True:
-            self.animation(enlevees)
+def 
 
 
 def main():
-    candyCrush = Jeu()
-    candyCrush.efface_ecran()
-    while candyCrush.enCourse:
-        candyCrush.afficher_commandes_possibles()
-        if candyCrush.etatJeu == "JEU":
-            candyCrush.afficher_jeu()
-            candyCrush.mise_a_jour_jeu()
+    grille = creer_grille_vide(taille_tableau)
+
+    commande_efface_ecran = ""  
+    if os.name == 'nt':  # Si on est sur Windows
+        commande_efface_ecran = "cls"
+    elif os.name == 'posix':  # Si on est sur Linux
+        commande_efface_ecran = "clear"
+
+    efface_ecran(commande_efface_ecran)
+    while enCourse:
+        afficher_commandes_possibles(etatJeu)
+        if etatJeu == "JEU":
+            affichage_grille(grille, 0)
+            mise_a_jour_jeu()
         
         commande = input("Commande: ").split(" ")
-        candyCrush.gerer_entree(commande[0], commande)
+        gerer_entree(commande[0], commande)
 
-        candyCrush.efface_ecran()
+        efface_ecran(commande_efface_ecran)
 
 if __name__=="__main__":
     main()
