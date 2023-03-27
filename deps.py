@@ -30,4 +30,3 @@ explications = ["Quitte le jeu si pendant une partie, sinon ferme le programme",
                 "Echange la position de deux bonbons (e.g. echanger i1,j1 i2,j2)",
                 "Redemarre la partie en cours",
                 ]
-

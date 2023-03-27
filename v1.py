@@ -324,7 +324,7 @@ class Jeu():
         Appele la fonction qui affiche la grille
         """
         if(self.etatJeu == "JEU"):
-            self.afficher_points()
+            self.afficheself.r_points()
             affichage_grille(self.grille, 0)
 
     def animation(self, index: list):

@@ -13,6 +13,12 @@ etatJeu = "MENU"
 
 delai = 0.45  # 450ms delai pour l'animation
 
+commande_efface_ecran = ""  
+if os.name == 'nt':  # Si on est sur Windows
+    commande_efface_ecran = "cls"
+elif os.name == 'posix':  # Si on est sur Linux
+    commande_efface_ecran = "clear"
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def creer_grille_aleatoire(N: int):
@@ -31,6 +37,10 @@ def creer_grille_vide(N: int):
 
 
 def copier_grille(grille: list) -> list:
+    """
+    Copie la grille initiale 
+    
+    """
     liste_copie = creer_grille_vide(len(grille))
     for i in range(len(grille)):
         liste_copie[i] = grille[i].copy()
@@ -132,21 +142,31 @@ def explication_jeu():
     print("\nObjectif du jeu: ")
     print("Dans un temps défini par le joueur, l'objectif est de marquer des points en échangeant de position les bonbons")
     print("\nRègles du jeu: ")
-    print("1. Une combinaison est possible si 3 bonbons de la même couleur ou plus sont alignés verticalement ou horizontalement")
-    print("2. Pour créer cette combinaison, le joueur peut échanger un bonbon avec son voisin")
-    print("3. Mais attention!!! C'est possible seulement si le changement crée une combinaison")
-    print("4. Chaque combinaison realisée donne des points en fonction du nombre de bonbons")
-    print("5. S'il n'y a plus de combinaison possibles, la grille sera remplacée automatiquement")
+    print("\t1. Une combinaison est possible si 3 bonbons de la même couleur ou plus sont alignés verticalement ou horizontalement")
+    print("\t2. Pour créer cette combinaison, le joueur peut échanger un bonbon avec l'un de ses voisins")
+    print("\t3. Mais attention!!! C'est possible seulement si le changement crée une combinaison")
+    print("\t4. Chaque combinaison realisée donne des points en fonction du nombre de bonbons")
+    print("\t5. S'il n'y a plus de combinaison possibles, le jeu finira")
 
     print("Bienvenido a este maravilloso juego \"Candy Crush\"!!")
     print("\nObjetivo del juego: ")
     print("En un tiempo definido por el jugador, el objetivo es de conseguir puntos intercambiando las posiciones de los dulces ")
-    print("\nReglas del juego: oh lala ")
-    print("1. Una combinación es posible si tres o más dulces están alineados vertical u horizontalmente")
-    print("2. Para crear esta combinación, el jugador puede intercambiar un dulce con su vecino")
-    print("3. ¡¡¡Pero cuidado!!! Es posible solamente si el intercambio crea una combinación")
-    print("4. Cada combinación realizada da puntos en función del número de dulces")
-    print("5. Si no hay más combinaciones posibles, el tablero será remplazado automáticamente")
+    print("\nReglas del juego: ")
+    print("\t1. Una combinación es posible si tres o más dulces están alineados vertical u horizontalmente")
+    print("\t2. Para crear esta combinación, el jugador puede intercambiar un dulce con uno de sus vecinos")
+    print("\t3. ¡¡¡Pero cuidado!!! Es posible solamente si el intercambio crea una combinación")
+    print("\t4. Cada combinación realizada da puntos en función del número de dulces")
+    print("\t5. Si no hay más combinaciones posibles, el juego terminará")
+    
+    print("Bem-vindo a este maravilhoso jogo \"Candy Crush\"!!")
+    print("\nObjetivo do jogo: ")
+    print("Marcar pontos mudando as posições dos doces, em um tempo limite definido pelo jogador")
+    print("\nRegras do jogo: ")
+    print("\t1. Temos uma combinação quando três ou mais doces estão alinhados horizontalmente ou verticalmente")
+    print("\t2. Para criar esta combinação, o jogador pode mudar um doce com um dos seus vizinhos")
+    print("\t3. Mas cuidado!!! Só é permitido se a mudança criar uma combinação")
+    print("\t4. Cada combinação realisada dá pontos em função do número de doces")
+    print("\t5. Se não há mais combinações possíveis, o jogo terminará")
     
     
 
@@ -206,17 +226,17 @@ def descendre_bonbons(grille):
     Fait descendre les bonbons déjà existants pour remplir le trou
     laissé par la fonction supprime_bonbons
     """
+    colonnes_modifiees = []
     for i in range(len(grille)):
         for j in range(len(grille[0])):
             y = i
-            if grille[i][j]==0 :
-                while y > 0 :
+            if grille[i][j] == 0 and (j not in colonnes_modifiees):
+                if y > 0:
                     grille[y][j]=grille[y-1][j]
                     y -= 1
-                if y == 0 :
+                if y == 0:
                     grille[y][j]= randint(1, len(CouleursBonbons) - 1)
-                    
-                    
+                colonnes_modifiees.append(j)
                 
 
 def nombre_vides(grille):
@@ -236,29 +256,28 @@ def remplir_grille(grille):
     Remplit les trous vides de la grille avec des valeurs aléatoires entre 
     1 et 4 aprés avoir utilisé la fonction descendre_bonbons
     """
+    for i in range(len(grille)):
+        for j in range(len(grille[0])):
+            if grille[i,j] == 0 :
+                grille[i,j] = (randint(1,len(CouleursBonbons)-1))
 
 
-def verifier_possibilite(grille):
+def verifie_possibilitees(grille):
     """
     Verifie s'il est encore possible d'échanger deux bonbons pour faire une 
     combinaison. S'il est possible, renvoie True. Sinon, renvoie False.
     """
-    combinaisons = 0
     for i in range(len(grille)):
         for j in range(len(grille[0])):
             if i+1 < len(grille) and bouger_bonbons(grille,i,j,i+1,j, modifier = False) == True :
-                combinaisons += 1
-            if j-1 > 0 and bouger_bonbons(grille,i,j,i,j-1) == True :
-                combinaisons += 1
-            if i-1 > 0 and bouger_bonbons(grille,i,j,i-1,j, modifier= False) == True :
-                combinaisons += 1
-            if j+1 < len(grille[0]) and bouger_bonbons(grille,i,j,i,j+1, modifier = False ) == True :
-                combinaisons += 1
+                return True
+            elif j-1 > 0 and bouger_bonbons(grille,i,j,i,j-1) == True :
+                return True
+            elif i-1 > 0 and bouger_bonbons(grille,i,j,i-1,j, modifier= False) == True :
+                return True
+            elif j+1 < len(grille[0]) and bouger_bonbons(grille,i,j,i,j+1, modifier = False ) == True :
+                return True
     
-    if combinaisons == 0 :
-        return False 
-    else :
-        return True 
 
 
 def quitter():
@@ -266,12 +285,38 @@ def quitter():
     Verifie l'etat du jeu: si on est en train de jouer
     retourne au menu principal, sinon arrete le programme
     """
+    global enCourse, etatJeu
     if etatJeu == "JEU":  # Si le jeu est en cours d'execution, retourne à l'ecran principale
         etatJeu = "MENU"
     else:                 # Sinon, quitter le programme
         enCourse = False
+def changer_taille_grille(N: list):
+    global taille_tableau
+    taille_tableau = int(N[0])
+def creer_tableau():
+    global points, grille
+    points = 0
+    grille = creer_grille_aleatoire(taille_tableau)
+def commencer_jeu():
+    global etatJeu, points
+    etatJeu = "JEU"
+    points = 0
+    creer_tableau()
+def redemarrer():
+    global points, grille
+    points = 0
+    grille = creer_grille_aleatoire(taille_tableau)
+def echanger(args: list):
+    global grille
+    succes = bouger_bonbons(grille, int(args[0].split(',')[0]), int(args[1].split(',')[0]), int(args[0].split(',')[1]), int(args[1].split(',')[1]))
+    if not succes:
+        print(WARNING + BOLD + "Les coordonnees donnees n'engendrent pas une combinaison..." + ENDC)
+        sleep(1.6)  # Valeur arbitraire
 
-def efface_ecran(cmd):
+def efface_ecran(cmd=commande_efface_ecran):
+    """
+    Utilise la bibliotheque OS pour effacer le terminal
+    """
     os.system(cmd)
 
 def afficher_commandes_possibles(etatJeu):
@@ -284,17 +329,64 @@ def afficher_commandes_possibles(etatJeu):
             print(f"\tEcrivez {BOLD}{commande}{ENDC} pour: {explications[i]}")
     print()
 
-def 
+fonctions = [quitter,
+             changer_taille_grille,
+             commencer_jeu,
+             echanger,
+             redemarrer]
+
+def gerer_entree(commande: str, args):
+    """
+    Verifie si l'entree est valide, au cas où decide quoi faire --> echanger
+    bonbons, quitter le jeu, redemarrer la partie, etc.
+    """    
+    if commande in commandes:
+        ind = commandes.index(commande)
+        arg = args[1:]
+        if len(arg) > 0:
+            fonctions[ind](arg)
+        else:
+            fonctions[ind]()
+
+def afficher_points():
+    string = f"Points: {points}"
+    print(f"{string:>{taille_tableau*2 + 12}}\n")
+
+def afficher_jeu():
+    """
+    Appele la fonction qui affiche la grille
+    """
+    if(etatJeu == "JEU"):
+        afficher_points()
+        affichage_grille(grille, 0)
+
+def animation():
+    efface_ecran()
+    while nombre_vides(grille) > 0:
+        afficher_commandes_possibles(etatJeu)
+        afficher_jeu()
+        sleep(delai)
+        efface_ecran()
+        descendre_bonbons(grille)
+    afficher_commandes_possibles(etatJeu)
+    afficher_jeu()
+
+def mise_a_jour_jeu():
+    """
+    Verifie les combinaisons et gère les points
+    """
+    global points, taille_tableau, grille
+    for i in range(taille_tableau):
+        for j in range(taille_tableau):
+            coords = detecte_coordonnees_combinaison(grille, i, j)
+            if len(coords) >= 3:  # Si il y a des cases où des combinaisons sont faits, supprime les et augmente les points
+                points += len(coords)
+                supprime_bonbons(grille, coords)
 
 
 def main():
+    global taille_tableau, etatJeu
     grille = creer_grille_vide(taille_tableau)
-
-    commande_efface_ecran = ""  
-    if os.name == 'nt':  # Si on est sur Windows
-        commande_efface_ecran = "cls"
-    elif os.name == 'posix':  # Si on est sur Linux
-        commande_efface_ecran = "clear"
 
     efface_ecran(commande_efface_ecran)
     while enCourse:
@@ -302,10 +394,12 @@ def main():
         if etatJeu == "JEU":
             affichage_grille(grille, 0)
             mise_a_jour_jeu()
+            animation()
+            if verifie_possibilitees(grille) == False:
+                etatJeu = "MENU"
         
         commande = input("Commande: ").split(" ")
         gerer_entree(commande[0], commande)
-
         efface_ecran(commande_efface_ecran)
 
 if __name__=="__main__":
