@@ -8,6 +8,7 @@ taille_tableau = 5  # Valeur defaut
 grille = []
 points = 0
 
+niveau = 3
 enCourse = True
 etatJeu = "MENU"
 
@@ -20,11 +21,16 @@ elif os.name == 'posix':  # Si on est sur Linux
     commande_efface_ecran = "clear"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-
+'commencer'
 def creer_grille_aleatoire(N: int):
     """
     Crée et renvoie une grille 2D de taille NxN avec des valeurs aleatoires 
-    (qui correspondent aux types de Bonbon sur l'objet 'Bonbons')    
+    (qui correspondent aux types de Bonbon sur l'objet 'Bonbons')   
+
+    Entrée :
+
+    Sortie :
+        liste : list 
     """
     return [[randint(1, len(CouleursBonbons)-1) for i in range(N)] for i in range(N)]
 
@@ -32,6 +38,11 @@ def creer_grille_aleatoire(N: int):
 def creer_grille_vide(N: int):
     """
     Crée et renvoie une grille 2D vide de taille NxN (vide: valeur 0)
+
+    Entrée :
+
+    Sortie :
+        liste : list
     """
     return [[0]*N]*N
 
@@ -39,6 +50,9 @@ def creer_grille_vide(N: int):
 def copier_grille(grille: list) -> list:
     """
     Copie la grille initiale 
+
+    Entrée :
+        grille: list
     
     """
     liste_copie = creer_grille_vide(len(grille))
@@ -50,6 +64,13 @@ def copier_grille(grille: list) -> list:
 def coordonnees_in_range(grille, i, j):
     """
     Helper function: verifie si les coordonnees sont bien dans la grille
+
+    Entrée : 
+        grille : list
+           i,j : int 
+
+    Sortie :
+        
     """
     # Pas du tout la meilleure façon de verifier les bornes, j'ai juste bien aimé la notation des maths XD
     if (i not in range(0, len(grille)) or j not in range(0, len(grille[0]))):
@@ -63,6 +84,13 @@ def echanger_bonbons(grille, i1, i2, j1, j2) -> bool:
     Échange la position dans la grille du bonbon de coordonnées (i1,j1) avec 
     celui de coordonnées (i2, j2), choisis par le joueur (si les coordonnées
     sont valides: à côté l'une de l'autre).
+    
+    Entrée :
+             grille : list
+        i1,i2,j1,j2 : int 
+
+    Sortie :
+    
     """
     if coordonnees_in_range(grille, i1, j1) and coordonnees_in_range(grille, i2, j2):
         # Si les bonbons sont alignées horizontalement ou verticalement(mais pas diagonalement) les échange
@@ -77,41 +105,84 @@ def echanger_bonbons(grille, i1, i2, j1, j2) -> bool:
         return False
 
 
-def detecte_coordonnees_combinaison(grille, i, j) -> list:
+def detecte_coordonnees_combinaison(grille, i, j, niveau=2) -> list:
     """
     Renvoie une liste contenant les coordonnées de tous les bonbons
-    appartenant à la combinaison du bonbon (i, j), s'il y a une. 
+    appartenant à la combinaison du bonbon (i, j) en fonction du niveau choisi.
+    detecte_coordonnees_combinaison(
+    Entrée :
+        grille : list
+           i,j : int
+        niveau : int 
+
+    Sortie :
+        bonbonsV : list
+        bonbonsH : list
+    
     """
+    
+    bonbonsV = []  # Stocker les bonbons valides verticaux 
+    bonbonsH = []  # Stocker les bonbons valides horizontaux
     if coordonnees_in_range(grille, i, j) and grille[i][j] != 0:
         # Fait d'abord l'analyse verticale
-        bonbons = []  # Stocker les bonbons valides
         ind = i
         while ind >= 0 and grille[ind][j] == grille[i][j]:
-            bonbons.append((ind, j))
+            bonbonsV.append((ind, j))
             ind -= 1
 
         ind = i+1
         while ind < len(grille) and grille[ind][j] == grille[i][j]:
-            bonbons.append((ind, j))
+            bonbonsV.append((ind, j))
             ind += 1
 
-        if len(bonbons) >= 3:
-            return bonbons
         else:
             # Ensuite, s'il n'y a pas de combinaison verticale, verifie la droite horizontale
-            bonbons = []
             ind = j
             while ind >= 0 and grille[i][ind] == grille[i][j]:
-                bonbons.append((i, ind))
+                bonbonsH.append((i, ind))
                 ind -= 1
 
             ind = j+1
             while ind < len(grille[0]) and grille[i][ind] == grille[i][j]:
-                bonbons.append((i, ind))
+                bonbonsH.append((i, ind))
                 ind += 1
+    
+    if len(bonbonsV) >= 3:
+        if niveau == 1:  # Supprime tous les bonbons sauf les 3 premiers
+            return bonbonsV[:3]
+        elif niveau == 2:  # Supprime tous les bonbons sauf les 3 premiers
+            return bonbonsV
+        elif niveau == 3:  # Supprime tous les bonbons sauf les 3 premiers
+            voisins = []
+            for i, j in bonbonsV:
+                if coordonnees_in_range(grille, i-1, j) and grille[i-1][j] == grille[i][j]:
+                    voisins.append((i-1, j))
+                if coordonnees_in_range(grille, i, j-1) and grille[i][j-1] == grille[i][j]:
+                    voisins.append((i, j-1))
+                if coordonnees_in_range(grille, i+1, j) and grille[i+1][j] == grille[i][j]:
+                    voisins.append((i+1, j))
+                if coordonnees_in_range(grille, i, j+1) and grille[i][j+1] == grille[i][j]:
+                    voisins.append((i, j+1))
+            return bonbonsV + voisins
+                
+    elif len(bonbonsH) >= 3:
+        if niveau == 1:  # Supprime tous les bonbons sauf les 3 premiers
+            return bonbonsH[:3]
+        elif niveau == 2:  # Supprime tous les bonbons sauf les 3 premiers
+            return bonbonsH
+        elif niveau == 3:  # Supprime tous les bonbons sauf les 3 premiers
+            voisins = []
+            for i, j in bonbonsH:
+                if coordonnees_in_range(grille, i-1, j) and grille[i-1][j] == grille[i][j]:
+                    voisins.append((i-1, j))
+                if coordonnees_in_range(grille, i, j-1) and grille[i][j-1] == grille[i][j]:
+                    voisins.append((i, j-1))
+                if coordonnees_in_range(grille, i+1, j) and grille[i+1][j] == grille[i][j]:
+                    voisins.append((i+1, j))
+                if coordonnees_in_range(grille, i, j+1) and grille[i][j+1] == grille[i][j]:
+                    voisins.append((i, j+1))
+            return bonbonsH + voisins
             
-            if len(bonbons) >= 3:
-                return bonbons
 
     return []
 
@@ -121,15 +192,25 @@ def bouger_bonbons(grille, i1, i2, j1, j2, modifier=True):
     Verifie si l'echange entre les bonbons est valide, au cas
     où echanger_bonbons est appelée et renvoie True, sinon
     renvoie False
+
+    Entrée :
+             grille : list
+        i1,i2,j1,j2 : int
+           modifier : bool
+    
+    Sortie :
+        booléen : bool
+
+    
     """
     grille_2 = copier_grille(grille)
     # Essaie de faire l'echange pour verifier si ça engendre des combinaisons
     echanger_bonbons(grille_2, i1, i2, j1, j2)
-    if (len(detecte_coordonnees_combinaison(grille_2, i1, j1)) >= 3 or
-       len(detecte_coordonnees_combinaison(grille_2, i2, j2)) >= 3):
-       if modifier:
+    if (len(detecte_coordonnees_combinaison(grille_2, i1, j1, niveau)) or
+       len(detecte_coordonnees_combinaison(grille_2, i2, j2, niveau)) >= 3):
+        if modifier:
             echanger_bonbons(grille, i1, i2, j1, j2)
-       return True
+        return True
     else:
         return False
     
@@ -138,6 +219,14 @@ def affichage_grille(grille, nb_type_bonbons):
     """
     Affiche la grille de jeu "grille" contenant au
     maximum "nb_type_bonbons" couleurs de bonbons différentes.
+
+    Entrée : 
+                grille : list
+        nb_type_bonbons : int 
+    
+    Sortie :
+
+
     """
 
     s = f"{UNDERLINE} {chr(0x2502)}"  # Char pour barre verticale
@@ -180,6 +269,12 @@ def test_detecte_coordonnees_combinaison():
 def supprime_bonbons(grille, index: list):
     """
     Supprime la combinaison de bonbons - remplace les valeurs par 0. 
+
+    Entrée :
+        grille : lis
+    
+    Sortie :
+        
     """
     for i, j in index:
         grille[i][j] = 0
@@ -189,6 +284,9 @@ def descendre_bonbons(grille):
     """
     Fait descendre les bonbons déjà existants pour remplir le trou
     laissé par la fonction supprime_bonbons
+
+    Entrée :
+        grille : list 
     """
     colonnes_modifiees = []
     for i in range(len(grille)):
@@ -205,6 +303,11 @@ def descendre_bonbons(grille):
 def nombre_vides(grille):
     """
     Fonction qui compte le nombre de cases vides
+
+    Entrée : 
+        grille : list 
+
+    Sortie :
     """
     total = 0
     for i in grille:
@@ -263,7 +366,8 @@ def creer_tableau():
 def commencer_jeu():
     global etatJeu, points
     etatJeu = "JEU"
-    points = 0
+    points = 04│♦ ☼ ♦ ☼ ◘ 
+
     creer_tableau()
 def redemarrer():
     global points, grille
@@ -288,7 +392,7 @@ def afficher_commandes_possibles(etatJeu):
         commande = commandes[i]
         if etatJeu == "JEU" and commandes[i] in ['quitter', 'echanger', 'redemarrer']:
             print(f"\tEcrivez {BOLD}{commande}{ENDC} pour: {explications[i]}")
-        elif etatJeu == "MENU" and commandes[i] in ['quitter', 'commencer', 'taille']:
+        elif etatJeu == "MENU" and commandes[i] in ['quitter', 'commencer', 'taille', 'niveau']:
             print(f"\tEcrivez {BOLD}{commande}{ENDC} pour: {explications[i]}")
     print()
 
@@ -342,7 +446,7 @@ def mise_a_jour_jeu() -> bool:
     des_combinaisons = False
     for i in range(taille_tableau):
         for j in range(taille_tableau):
-            coords = detecte_coordonnees_combinaison(grille, i, j)
+            coords = detecte_coordonnees_combinaison(grille, i, j, niveau)
             if len(coords) >= 3:  # Si il y a des cases où des combinaisons sont faits, supprime les et augmente les points
                 points += len(coords)
                 supprime_bonbons(grille, coords)
@@ -373,3 +477,6 @@ def main():
 
 if __name__=="__main__":
     main()
+
+
+    
