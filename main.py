@@ -21,7 +21,7 @@ elif os.name == 'posix':  # Si on est sur Linux
     commande_efface_ecran = "clear"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-'commencer'
+
 def creer_grille_aleatoire(N: int):
     """
     Crée et renvoie une grille 2D de taille NxN avec des valeurs aleatoires 
