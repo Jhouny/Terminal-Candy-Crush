@@ -21,7 +21,7 @@ elif os.name == 'posix':  # Si on est sur Linux
     commande_efface_ecran = "clear"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-
+'commencer'
 def creer_grille_aleatoire(N: int):
     """
     Crée et renvoie une grille 2D de taille NxN avec des valeurs aleatoires 
@@ -366,7 +366,7 @@ def creer_tableau():
 def commencer_jeu():
     global etatJeu, points
     etatJeu = "JEU"
-    points = 0 
+    points = 0
 
     creer_tableau()
 def redemarrer():
@@ -378,7 +378,7 @@ def echanger(args: list):
     succes = bouger_bonbons(grille, int(args[0].split(',')[0]), int(args[1].split(',')[0]), int(args[0].split(',')[1]), int(args[1].split(',')[1]))
     if not succes:
         print(WARNING + BOLD + "Les coordonnees donnees n'engendrent pas une combinaison..." + ENDC)
-        sleep(1.6)  # Valeur arbitraire
+        sleep(2.5)  # Valeur arbitraire
 
 def efface_ecran(cmd=commande_efface_ecran):
     """
@@ -470,6 +470,11 @@ def main():
     global taille_tableau, etatJeu
     grille = creer_grille_vide(taille_tableau)
 
+    efface_ecran(commande_efface_ecran)
+    langue = input("\nEn quelle langue voulez-vous les explications du jeu? (choix possible entre fr, es, pt)")
+    efface_ecran(commande_efface_ecran)
+    explication_jeu(langue)
+    input("Cliquer sur entrée pour continuer")
     efface_ecran(commande_efface_ecran)
     while enCourse:
         afficher_commandes_possibles(etatJeu)
