@@ -26,23 +26,23 @@ commandes = ['quitter',
              'niveau']
 
 explications = ["Quitter le jeu si pendant une partie, sinon fermer le programme",
-                "Definir la taille du tableau",
+                "Definir la taille du tableau de n lignes et colonnes (ex: taille 6)",
                 "Commencer la partie",
-                "Echanger la position de deux bonbons (e.g. echanger i1,j1 i2,j2)",
+                "Echanger la position de deux bonbons (ex : echanger i1,j1 i2,j2)",
                 "Redemarrer la partie en cours",
-                "Change le niveau du jeu (1, 2 ou 3)"]
+                "Change le niveau du jeu (1, 2 ou 3) (ex: niveau 2)"]
 
 
 def explication_jeu(langue):
     """
-    Donne des explications sur le fonctionnement du jeu dans la lague choisi
+    Donne des explications sur le fonctionnement du jeu dans la langue choisi
 
     """
 
     if langue.lower() == "es" :
         print("Bienvenido a este maravilloso juego \"Candy Crush\"!!")
         print("\nObjetivo del juego: ")
-        print("En un tiempo y un nivel definidos por el jugador, el objetivo es de conseguir puntos intercambiando las posiciones de los dulces ")
+        print("En un nivel definidos por el jugador, el objetivo es de conseguir puntos intercambiando las posiciones de los dulces ")
         print("\nReglas del juego: ")
         print("\t1. Dependiendo del nivel escogido por el jugador, una combinación puede ser realizada de diferentes maneras")
         print("\t2. Para crear esta combinación, el jugador puede intercambiar un dulce con uno de sus vecinos")
@@ -58,7 +58,7 @@ def explication_jeu(langue):
 
         print("Bem-vindo a este maravilhoso jogo \"Candy Crush\"!!")
         print("\nObjetivo do jogo: ")
-        print("Marcar pontos mudando as posições dos doces, em um tempo limite definido pelo jogador")
+        print("Marcar pontos mudando as posições dos doces, em um nivel limite definido pelo jogador")
         print("\nRegras do jogo: ")
         print("\t1. Temos uma combinação quando três ou mais doces estão alinhados horizontalmente ou verticalmente")
         print("\t2. Para criar esta combinação, o jogador pode mudar um doce com um dos seus vizinhos")
@@ -66,13 +66,13 @@ def explication_jeu(langue):
         print("\t4. Cada combinação realisada dá pontos em função do número de doces")
         print("\t5. Se não há mais combinações possíveis, o jogo terminará")
         print("\nNivel de jogo: ")
-        print("\tNivel 1 : So eliminamos os combinaçoes de 3 doces da mesma cor alinhados verticalmente ou horizontalmente. Por isso, se temos 4 doces alinhados, apenas 3 sao eliminados")
+        print("\tNivel 1 : So eliminamos os combinaçoes de 3 doces da mesma cor alinhados verticalmente ou horizontalmente. Por isso, se temos 4 doces alinhados, apenas 3 são eliminados")
         print("\tNivel 2 : Eliminamos todos os doces da mesma cor alinhados verticalmente ou horizontalmente com um minimo de 3 doces.")
-        print("\tNivel 3 : Se pelo menos 3 doces estiverem alinhados (verticalmente ou horizontalmente), entao eliminamos todos os doces da mesma cor que sao vizinhos dum doce eliminado")
+        print("\tNivel 3 : Se pelo menos 3 doces estiverem alinhados (verticalmente ou horizontalmente), então eliminamos todos os doces da mesma cor que são vizinhos dum doce eliminado")
     else : 
         print("Bienvenue dans ce merveilleux jeu\"Candy Crush\"!!")
         print("\nObjectif du jeu: ")
-        print("Dans un temps et un niveau définis par le joueur, l'objectif est de marquer des points en échangeant de position les bonbons")
+        print("Dans un niveau définis par le joueur, l'objectif est de marquer des points en échangeant de position les bonbons")
         print("\nRègles du jeu: ")
         print("\t1. Selon le niveau choisi par le joueur, une combinaison peut se faire de différentes manières")
         print("\t2. Pour créer cette combinaison, le joueur peut échanger un bonbon avec l'un de ses voisins")

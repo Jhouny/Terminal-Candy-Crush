@@ -21,7 +21,6 @@ elif os.name == 'posix':  # Si on est sur Linux
     commande_efface_ecran = "clear"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-'commencer'
 def creer_grille_aleatoire(N: int):
     """
     Crée et renvoie une grille 2D de taille NxN avec des valeurs aleatoires 
@@ -367,7 +366,6 @@ def commencer_jeu():
     global etatJeu, points
     etatJeu = "JEU"
     points = 0
-
     creer_tableau()
 def redemarrer():
     global points, grille
@@ -379,7 +377,13 @@ def echanger(args: list):
     if not succes:
         print(WARNING + BOLD + "Les coordonnees donnees n'engendrent pas une combinaison..." + ENDC)
         sleep(2.5)  # Valeur arbitraire
-
+def niveau(args:list):
+    global niveau
+    niveau = int(args[0])
+    if niveau < 1:
+        niveau = 1
+    elif niveau > 3:
+        niveau = 3 
 def efface_ecran(cmd=commande_efface_ecran):
     """
     Utilise la bibliotheque OS pour effacer le terminal
@@ -400,7 +404,8 @@ fonctions = [quitter,
              changer_taille_grille,
              commencer_jeu,
              echanger,
-             redemarrer]
+             redemarrer,
+             niveau]
 
 def gerer_entree(commande: str, args):
     """
