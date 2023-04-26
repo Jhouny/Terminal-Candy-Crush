@@ -377,7 +377,7 @@ def echanger(args: list):
     if not succes:
         print(WARNING + BOLD + "Les coordonnees donnees n'engendrent pas une combinaison..." + ENDC)
         sleep(2.5)  # Valeur arbitraire
-def niveau(args:list):
+def changer_niveau(args:list):
     global niveau
     niveau = int(args[0])
     if niveau < 1:
@@ -405,7 +405,7 @@ fonctions = [quitter,
              commencer_jeu,
              echanger,
              redemarrer,
-             niveau]
+             changer_niveau]
 
 def gerer_entree(commande: str, args):
     """
